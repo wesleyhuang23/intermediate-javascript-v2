@@ -26,19 +26,19 @@
 // Remove entries from the array until only correct answers remain
 
 // Which function(s) access the weather variable and get "rainy" (Delete wrong answers, leave correct ones)
-var scopeArray1 = ["street", "firstFloor", "secondFloor", "neighbors", "neighborsSecondFloor"];
+var scopeArray1 = ["street", "firstFloor", "secondFloor"];
 
 // Which function(s) access the weather variable and get "dry" (Delete wrong answers, leave correct ones)
-var scopeArray2 = ["street", "firstFloor", "secondFloor", "neighbors", "neighborsSecondFloor"];
+var scopeArray2 = ["firstFloor", "secondFloor"];
 
 // Which function(s) access the ceiling variable and get undefined (Delete wrong answers, leave correct ones)
-var scopeArray3 = ["street", "firstFloor", "secondFloor", "neighbors", "neighborsSecondFloor"];
+var scopeArray3 = ["street", "firstFloor", "secondFloor"];
 
 // Which functions accesss the ceiling variable and get "leaking" (Delete wrong answers, leave correct ones)
-var scopeArray4 = ["street", "firstFloor", "secondFloor", "neighbors", "neighborsSecondFloor"];
+var scopeArray4 = ["neighbors", "neighborsSecondFloor"];
 
 // Which functions access the temperature variable and get 72 (Delete wrong answers, leave correct ones)
-var scopeArray5 = ["street", "firstFloor", "secondFloor", "neighbors", "neighborsSecondFloor"];
+var scopeArray5 = ["secondFloor"];
 
 
 // #2  ###################
@@ -50,11 +50,23 @@ var changed = false;
   which changes the variable changed (above) to the boolean true;
   And resolve the promise when setTimeout completes.
 */
+function async(){
+  var deferred = $q.defer();
+  function change(){
+    changed = true;
+  }
+  return deferred.promise;
+}
+setTimeout(function(){
+   async();
+   return deferred.resolve;
+ }, 1000);
+
 
 
 var contextObj = {
   number: 0
-}
+};
 
 function sum(x, y) {
   return this.number += (x + y);
@@ -65,7 +77,9 @@ function sum(x, y) {
 // Create a function called context1 that will take in two numbers x and y.
 // invoke sum passing in the two numbers x and y and explicitly set the context to the object called contextObj.
 //
-
+function context1(x, y){
+  return sum.call(contextObj, x, y);
+}
 
 
 // #4 ####################
@@ -73,7 +87,9 @@ function sum(x, y) {
 // Write a function called context2 that will take in an array of numbers called params
 // invoke sum and explicity set the context to the object called contextObj, and pass in the array called params.
 //
-
+function context2(params){
+  return sum.apply(contextObj, params);
+}
 
 
 
@@ -82,13 +98,19 @@ function sum(x, y) {
 // Write a function called context3.
 // Make context3 permanently link the context of sum to the object contextObj.
 // This should give you a new function. Return it.
-
+function context3(){
+  return sum.bind(contextObj);
+}
 
 
 // #6  ###################
 // # Constructor Function
 // Make a constructor function called Sandwich that takes in 3 parameters: bread, meat, spread and assigns them to identically named properties.
-
+function Sandwich(bread, meat, spread){
+  this.bread = bread;
+  this.meat = meat;
+  this.spread = spread;
+}
 
 
 
@@ -96,21 +118,44 @@ function sum(x, y) {
 // # Implicit binding
 // Make a constructor function called RoadTrip.  It has a property called gasLeft = 100.  It has a property called drive that is a function.  When drive is invoked it uses context to implicitly subract 10 from the gasLeft on the roadTrip.
 
-
+function RoadTrip(){
+  this.gasLeft = 100;
+  this.drive = function(){
+    this.gasLeft = this.gasLeft - 10;
+  };
+}
 
 
 
 // #8  ###################
 // # Prototype 1
 // Add prototype function called addTwo to the array type that adds two to the value of every item in the array.
-
+Array.prototype.addTwo = function(){
+  for(var i = 0; i < this.length; i++){
+    this[i] += 2;
+  }
+  return this;
+};
 
 
 
 // #9  ###################
 // # Prototype 2
 // Write a constructor function called CoinToss.  It has a property called results which is an empty array.  It has a prototype function called flip.  When flip is invoked it uses context to implicitly add 'heads' or 'tails' to the results array.
-
+function CoinToss(){
+  this.results = [];
+  this.flip = function(){
+    var num = Math.floor(Math.random() * 10, 1);
+    if(num <= 5){
+      this.results.push('heads');
+    }
+    else{
+      this.results.push('tails');
+    }
+  };
+  this.flip();
+  return this.results;
+}
 
 
 
@@ -119,7 +164,12 @@ function sum(x, y) {
 // # Closure 1
 // Write a function called animalMachine that creates new animals from two existing animals.  It takes in a parameter called partOne.  It returns a function called animalSmasher.
 // When animalSmasher is invoked it should take in a parameter called partTwo and return a new string that adds partOne and partTwo together.
-
+function animalMachine(partOne){
+  function animalSmasher(partTwo){
+    return partOne + partTwo;
+  }
+  return animalSmasher;
+}
 
 
 // #11  ###################
@@ -134,7 +184,15 @@ function sum(x, y) {
 //     guestList: <Array of ingredients goes here>
 // }
 // ```
-
+function partyTime(partyName){
+  obj = {};
+  obj.guestList = [];
+  return function addGuest(){
+    obj.partyName = partyName;
+    obj.guestList.push(partyName);
+    return obj;
+  };
+}
 
 
 
@@ -144,3 +202,14 @@ function sum(x, y) {
 // If both parameters are the same type an the same value return "Exact match".
 // If both parameters have the same value but are different types return "Different types"
 // Otherwise return "Different values"
+function compareValues(param1, param2){
+  if(param1 === param2){
+    return "Exact match";
+  }
+  else if(typeof param1 !== typeof param2 && param1 == param2){
+    return "Different types";
+  }
+  else {
+    return "Different values";
+  }
+}
